@@ -1,0 +1,126 @@
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char* readline();
+char* ltrim(char*);
+char* rtrim(char*);
+char** split_string(char*, int*);
+int parse_int(char*);
+int hourglassSum(int arr_rows, int arr_columns, int** arr) 
+{
+    int max_sum = INT_MIN;
+    for (int i = 1; i < arr_rows - 1; i++) 
+    {
+        for (int j = 1; j < arr_columns - 1; j++) 
+        {
+            int sum = arr[i-1][j-1] + arr[i-1][j] + arr[i-1][j+1] 
+                    + arr[i][j]
+                    + arr[i+1][j-1] + arr[i+1][j] + arr[i+1][j+1]; 
+            if (sum > max_sum) 
+            {
+                max_sum = sum;
+            }
+        }
+    }
+    return max_sum;
+}
+int main() 
+{
+    char* output_path = getenv("OUTPUT_PATH");
+    FILE* fptr = output_path ? fopen(output_path, "w") : stdout;
+    int** arr = malloc(6 * sizeof(int*));
+    for (int i = 0; i < 6; i++) 
+    {
+        arr[i] = malloc(6 * sizeof(int));
+        char* line = rtrim(readline());
+        int count;
+        char** arr_item_temp = split_string(line, &count);
+        for (int j = 0; j < 6; j++) 
+        {
+            arr[i][j] = parse_int(arr_item_temp[j]);
+        }
+        free(arr_item_temp);
+        free(line);
+    }
+    int result = hourglassSum(6, 6, arr);
+    fprintf(fptr, "%d\n", result);
+    
+    if (fptr != stdout) fclose(fptr);
+    for (int i = 0; i < 6; i++) {
+        free(arr[i]);
+    }
+    free(arr);
+    return 0;
+}
+char* readline() 
+{
+    size_t alloc_length = 1024;
+    size_t data_length = 0;
+    char* data = malloc(alloc_length);
+    while (true) 
+    {
+        char* cursor = data + data_length;
+        char* line = fgets(cursor, alloc_length - data_length, stdin);
+        if (!line) 
+        {
+            break;
+        }
+        data_length += strlen(cursor);
+        if (data_length < alloc_length - 1 || data[data_length - 1] == '\n') 
+        {
+            break;
+        }
+        alloc_length <<= 1;
+        data = realloc(data, alloc_length);
+    }
+    if (data_length > 0 && data[data_length - 1] == '\n') 
+    {
+        data[data_length - 1] = '\0';
+    }
+    return data;
+}
+char* ltrim(char* str) 
+{
+    while (*str != '\0' && isspace(*str)) 
+    {
+        str++;
+    }
+    return str;
+}
+
+char* rtrim(char* str)
+{
+    char* end = str + strlen(str) - 1;
+    while (end >= str && isspace(*end)) 
+    {
+        end--;
+    }
+    *(end + 1) = '\0';
+    return str;
+}
+char** split_string(char* str, int* count) 
+{
+    char** splits = NULL;
+    char* token = strtok(str, " ");
+    *count = 0;
+    while (token) 
+    {
+        splits = realloc(splits, sizeof(char*) * (*count + 1));
+        splits[*count] = token;
+        (*count)++;
+        token = strtok(NULL, " ");
+    }
+    return splits;
+}
+int parse_int(char* str) 
+{
+    return strtol(str, NULL, 10);
+}
