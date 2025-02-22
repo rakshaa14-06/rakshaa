@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+void rotateLeft(int arr[], int n, int d) {
+    d = d % n; // Handle cases where d > n
+    int rotated[n]; // Temporary array to store rotated result
+
+    for (int i = 0; i < n; i++) {
+        rotated[i] = arr[(i + d) % n]; // Compute new positions
+    }
+
+    // Copy rotated array back to the original array
+    for (int i = 0; i < n; i++) {
+        arr[i] = rotated[i];
+    }
+}
+
+int main() {
+    int n, d;
+    
+    // Read input values
+    scanf("%d %d", &n, &d);
+    int arr[n];
+
+    // Read array elements
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    // Perform rotation
+    rotateLeft(arr, n, d);
+
+    // Print rotated array
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
